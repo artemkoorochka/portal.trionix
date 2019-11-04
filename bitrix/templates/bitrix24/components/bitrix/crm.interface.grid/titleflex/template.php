@@ -118,6 +118,9 @@ if(isset($arParams['~ENABLE_ROW_COUNT_LOADER']) && $arParams['~ENABLE_ROW_COUNT_
  * That condionn for a history tab solo
  * For example for CRM main page
  * [GRID_ID] => CRM_LEAD_LIST_V12
+ * Отдел продаж Астана - 22
+ * Отдел продаж ПЗПТ - 5
+ * Отдел продаж УЗТИ - 14
  */
 
 if($arParams["GRID_ID"] == "CRM_INTERNAL_EVENT_LIST_TAB_EVENT")
@@ -141,24 +144,32 @@ if($arParams["GRID_ID"] == "CRM_INTERNAL_EVENT_LIST_TAB_EVENT")
             )
         ))->fetch();
         $departaments = $departaments["UF_DEPARTMENT"];
-        if(!empty($departaments))
-        {
-            $departamentUsers = array();
-            $users = Bitrix\Main\UserTable::getList(array(
-                "select" => array("ID"),
-                "filter" => array("UF_DEPARTMENT" => $departaments)
-            ));
-            while ($user = $users->fetch()){
-                $departamentUsers[] = $user["ID"];
+
+        if(
+                in_array(14, $departaments) ||
+                in_array(22, $departaments) ||
+                in_array(5, $departaments)
+        ){
+            if(!empty($departaments))
+            {
+                $departamentUsers = array();
+                $users = Bitrix\Main\UserTable::getList(array(
+                    "select" => array("ID"),
+                    "filter" => array("UF_DEPARTMENT" => $departaments)
+                ));
+                while ($user = $users->fetch()){
+                    $departamentUsers[] = $user["ID"];
+                }
+                if(in_array($row["CREATED_BY_ID"], $departamentUsers)){
+                    continue;
+                }
             }
-            if(in_array($row["CREATED_BY_ID"], $departamentUsers)){
-                continue;
-            }
+            /**
+             * иначе удаляем элемент из выборки
+             */
+            unset($arParams['~ROWS'][$id]);
         }
-        /**
-         * иначе удаляем элемент из выборки
-         */
-        unset($arParams['~ROWS'][$id]);
+
     }
 }
 
